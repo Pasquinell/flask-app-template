@@ -17,7 +17,7 @@ For activating the virtualenv write
 ```
 source our_file_name/bin/activate
 ```
-After that, you have to set your database. First, install MySQL. You will have a password assigned, for changing it first enter to the root session
+After that, you have to set your database. First, install MySQL. From the terminal window, go to flask-app-template/flask-app-template, you will have a password assigned, for changing it first enter to the root session
 ```
 mysql -u root -p
 ```
@@ -32,6 +32,14 @@ create databae myDatabase;
 and use it
 ```
 use myDataBase;
+```
+The final step in MySQL, is to create and populate the tables we are going to use. 
+```
+source dababase-schema.sql;
+```
+and then
+```
+source populate.sql;
 ```
 Quit the MySQL with `\q`. In your favorite text editor open `_main.py` and change 
 ```
