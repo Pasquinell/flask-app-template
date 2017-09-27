@@ -7,7 +7,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
-#from . import config # config is not defined in the tutorial
+from functools import wraps
 
 app =  Flask(__name__)
 
@@ -22,18 +22,19 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor' # this works with ... for getting
 # init mysql
 mysql = MySQL(app)
 
+# home
 @app.route("/")
 def home():
 	return render_template('home.html')
 
 
-
+# About us
 @app.route("/aboutus")
 def aboutus():
 	return render_template('aboutus.html')
 
 
-
+# Error 404 handler
 @app.errorhandler(404)
 def not_found(error):
 	return render_template('404.html'),404
@@ -42,6 +43,7 @@ def not_found(error):
 
 ### Registration
 
+# Register form class
 class RegisterForm(Form):
 	name = StringField('Name', [validators.Length(min = 1, max = 50)])
 	username = StringField('Username', [validators.Length(min = 4, max = 25)])
@@ -51,6 +53,7 @@ class RegisterForm(Form):
 		validators.EqualTo('confirm', message = 'passwords do not match')])
 	confirm = PasswordField('Confirm Password')
 
+# User register
 @app.route('/register', methods = ['GET', 'POST'])
 def index():
 	form = RegisterForm(request.form) #this request object is imported from flask
@@ -82,7 +85,7 @@ def index():
 
 	return render_template('register.html', form = form)
 
-
+# User login
 @app.route('/login', methods = ['GET','POST'])
 def login():
 	if request.method == 'POST':
@@ -104,7 +107,7 @@ def login():
 			# Compare passwords
 			if sha256_crypt.verify(password_candidate,password):
 				# Passed
-				session['loged_in'] = True
+				session['logged_in'] = True # session is a function/object (not sure) of flask
 				session['username'] = username
 
 				flash('You are now logged in', 'success')
@@ -122,7 +125,31 @@ def login():
 	return render_template('login.html')
 
 
+# Check if user logged in
+# This function will be used as a decorator for prohibiting people not logged to enter in to the url
+def is_logged_in(f):
+	@wraps(f)
+	def wrap(*args,**kwargs):
+		if 'logged_in' in session:
+			return f(*args,**kwargs)
+		else:
+			flash('Unauthorized, please log in','danger')
+			return redirect(url_for('login'))
+	return wrap
+
+
+# Logout
+@app.route('/logout')
+def logout():
+	session.clear()
+	flash('Now you are logged out','success')
+	#return render_template('/login.html')
+	return redirect(url_for('login')) 
+
+
+# Dashboard 
 @app.route('/dashboard')
+@is_logged_in
 def dashboard():
 	return render_template('dashboard.html')
 
