@@ -7,7 +7,7 @@ This template is for creating small applications with Flask. I used Python3 and 
 For making this project work, first clone the repository. Then, create a new virtualenv with python3 in your machine
 
 ```
-virtualenv -p python3 virtualenv_name
+virtualenv -p python3 venv
 ```
 After that, you are ready for installing all the dependencies
 ```
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ```
 For activating the virtualenv write
 ```
-source our_file_name/bin/activate
+source venv/bin/activate
 ```
 After that, you have to set your database. First, install MySQL. From the terminal window, go to flask-app-template/flask-app-template, you will have a password assigned, for changing it first enter to the root session
 ```
